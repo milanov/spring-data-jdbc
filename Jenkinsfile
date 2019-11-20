@@ -36,14 +36,14 @@ pipeline {
 		}
 
 		stage("Test other configurations") {
+			when {
+				anyOf {
+					branch 'master'
+					not { triggeredBy 'UpstreamCause' }
+				}
+			}
 			parallel {
 				stage("test: baseline (jdk11)") {
-					when {
-						anyOf {
-							branch 'master'
-							not { triggeredBy 'UpstreamCause' }
-						}
-					}
 					agent {
 						docker {
 							image 'adoptopenjdk/openjdk11:latest'
@@ -59,13 +59,8 @@ pipeline {
 						sh "chown -R 1001:1001 target"
 					}
 				}
+
 				stage("test: baseline (jdk13)") {
-					when {
-						anyOf {
-							branch 'master'
-							not { triggeredBy 'UpstreamCause' }
-						}
-					}
 					agent {
 						docker {
 							image 'adoptopenjdk/openjdk13:latest'
